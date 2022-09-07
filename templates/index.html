@@ -1,0 +1,255 @@
+<!--extending the base template-->
+{% extends 'base.html' %}
+<!-- page title-->
+{% block title %}
+  To Do List
+{% endblock %}
+{% block page_heading%}
+  TO DO LIST
+  <!--Page heading-->
+{% endblock %}
+{% block content %}
+<!--Table to display the data-->
+<button class="btn btn-outline btn-info" id="add_task" type="button" data-toggle="modal" data-target="#myModal">&nbspAdd Task</button>
+<table class="table table-hover table-dark">
+        <thead>
+            <tr>
+                <!-- Columns names are HERE -->
+                <th scope="col">Status</th>
+                <th scope="col">What you need to do</th>
+                <th scope="col">Due date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Your rows inside the table HERE: -->
+            {% for item in data%}
+                <tr>
+                    {% if item.completed%}
+                        <td bgcolor= "green">Completed</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.due_on }}</td>
+						<td>{{ item.notes }}</td>
+                        <td>
+                            <form action="{% url 'index' %}" method="post">
+								{% csrf_token %}
+                            	<button class="btn btn-outline btn-info" name="Statuscomp" value="{{item.gid}}">Mark as Undone</button>
+                            </form>
+                        </td>
+						<td>
+							<button class="btn btn-outline btn-info" id="modify_task" type="button" onclick="myFunction()">&nbspModify Task</button>
+						</td>
+                        <td>
+                            <form action="{% url 'index' %}" method="post">
+								{% csrf_token %}	
+                            	<button class="btn btn-outline btn-success" name="Delete" value="{{item.gid}}">Delete</button>   
+                            </form>                             
+                        </td>
+                    {% else %}
+                        <td bgcolor= "red">Incomplete</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.due_on }}</td>
+						<td>{{ item.notes }}</td>
+						<td>
+                            <form action="{% url 'index' %}" method="post">
+								{% csrf_token %}
+								<button class="btn btn-outline btn-info" name="Statusinc" value="{{item.gid}}">Mark as Done</button>
+                            </form>
+                        </td>
+						<td>
+							<button class="btn btn-outline btn-info" id="modify_task" type="button" onclick="myFunction()">&nbspModify Task</button>
+						</td>
+						<td>
+                            <form action="{% url 'index' %}" method="post">
+								{% csrf_token %}					
+								<button class="btn btn-outline btn-success" name="Delete" value="{{item.gid}}">Delete</button>  
+							</form>
+                        </td>
+                    {% endif %}
+                </tr>
+				<tr class="Modify_task_section">
+				<form class="form"  action="{% url 'index' %}" method="post">
+					{% csrf_token %}
+					<td>&nbsp</td>
+					<input id="AddingTask" type="checkbox" name="Modifyingtask" value="{{item.gid}}" checked>
+					<td>
+						<input class="form-control form-control-lg" type="text" name="mod_task_name" id="To_do_item" placeholder="What do you have to do" value="{{item.name}}">
+                    </td>
+                    <td>
+						<input class="form-control form-control-lg" type="date" name="mod_task_due" id="To_do_item" value="{{item.due_on}}">
+                    </td>
+					<td>
+						<input class="form-control form-control-lg" type="text" name="mod_task_notes" id="To_do_item" value="{{item.notes}}">
+                    </td>
+                        <td>&nbsp</td>
+						<td>&nbsp</td>
+						<td><button class="btn btn-outline btn-success">Modify Task</button></td>
+				</form>
+				</tr>
+			
+            {% empty %}
+                <!--If the list empty show dummy data-->
+                <tr>
+                    <td bgcolor= "red">Incomplete</td>
+                    <td>Add something to the to do list</td>
+                    <td>end of time</td>
+                    <td>
+                        <form action="" method="post">
+                        <button class="btn btn-outline btn-success" disabled>Mark as complete</button>
+                        </form>                                
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content clearfix">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<div class="modal-body">
+					<h3 class="title">Add Task</h3>
+					<p class="description">Create a new Task</p>
+					<form class="form" action="{% url 'index' %}" method="post">
+						{% csrf_token %}
+						<input id="AddingTask" type="checkbox" name="UserCreatingtask" value="AddingTask" checked>
+					  <div class="form-group">
+						  <span class="input-icon"><i class="fa fa-user"></i></span>
+						  <input class="form-control form-control-lg" type="text" name="add_task_name" id="To_do_item" placeholder="What do you have to do">
+					  </div>
+					  <div class="form-group">
+						<span class="input-icon"><i class="fa fa-user"></i></span>
+						<input class="form-control form-control-lg" type="date" name="add_task_due" id="To_do_item" placeholder="When is it due">
+					</div>
+					  <div class="form-group">
+						  <span class="input-icon"><i class="fas fa-key"></i></span>
+						  <input class="form-control form-control-lg" type="text" name="add_task_notes" id="To_do_item" placeholder="Summary">
+					  </div>
+					  <!-- <a href="" class="forgot-pass">Forgot Password?</a> -->
+					  <!-- <div class="form-group checkbox">
+						  <input type="checkbox">
+						  <label>Remember me</label>
+					  </div> -->
+					  <button class="btn btn-outline btn-success">Create Task</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block style %}
+    <!--Style block-->
+    <style>
+    .Form_container{
+        margin:auto;
+        width:22%;
+    }
+	.show-modal{
+		color: #fff;
+		width: 80px;
+		/* background: linear-gradient(to right, #33a3ff, #0675cf, #49a6fd); */
+		background-color: rgb(71, 71, 71);
+		color: crimson;
+		font-size: 18px;
+		font-weight: 600;
+		text-transform: capitalize;
+		/* padding: 10px 15px;
+		margin: 200px auto 0; */
+		border: none;
+		outline: none;
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+		display: block;
+		transition: all 0.3s ease 0s;
+
+		
+	}
+	.show-modal:hover,
+	.show-modal:focus{
+		color: #fff;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+		outline: none;
+		background-color: crimson;
+		
+	}
+	.modal-dialog{
+		width: 400px;
+		margin: 70px auto 0;
+	}
+	.modal-dialog{ transform: scale(0.5); }
+	.modal-dialog{ transform: scale(1); }
+	.modal-dialog .modal-content{
+		text-align: center;
+		border: none;
+	}
+	.modal-content .close{
+		color: #fff;
+		background-color: crimson;
+		font-size: 25px;
+		font-weight: 400;
+		text-shadow: none;
+		line-height: 27px;
+		height: 25px;
+		width: 25px;
+		border-radius: 50%;
+		overflow: hidden;
+		opacity: 1;
+		position: absolute;
+		left: auto;
+		right: 8px;
+		top: 8px;
+		z-index: 1;
+		transition: all 0.3s;
+	}
+	#x{
+	margin-top: -5px;
+	}
+	.modal-content .close:hover{
+		color: #fff;
+		box-shadow: 0 0 5px rgba(0,0,0,0.5);
+	}
+	.close:focus{ outline: none; }
+	.modal-body{ padding: 60px 40px 40px !important; }
+	.modal-body .title{
+		color: crimson;
+		font-size: 33px;
+		font-weight: 700;
+		letter-spacing: 1px;
+		margin: 0 0 10px;
+	}
+	.modal-body .description{
+		color: black;
+		font-size: 16px;
+		margin: 0 0 20px;
+	}
+	.modal-body .form-group{
+		text-align: left;
+		margin-bottom: 20px;
+		position: relative;
+	}
+	.modal-body .input-icon{
+		color: crimson;
+		font-size: 18px;
+		transform: translateY(-50%);
+		position: absolute;
+		top: 50%;
+		left: 20px;
+	}
+	#AddingTask{
+		display: none;
+	}
+	.Modify_task_section{
+		display: none;
+	}
+    </style>
+	<script>
+		function myFunction() {
+			var on = document.getElementsByClassName("Modify_task_section");
+			for(var i = 0; i < on.length; i++) {
+				if (on[i].style.display === "none"){
+    				on[i].style.display="table-row";
+				}
+				else{
+					on[i].style.display="none";
+				}
+			}
+		}
+	</script>
+{% endblock %}
